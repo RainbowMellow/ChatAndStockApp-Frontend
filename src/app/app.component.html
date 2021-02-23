@@ -1,3 +1,9 @@
-<a routerLink="/">Home</a> ----
-<a routerLink="/chats">Chat <span *ngIf="clients$ | async as clients">({{clients.length}} users online!)</span></a>
-<router-outlet></router-outlet>
+<div class="container">
+  <div class="row navbar-style">
+    <div class="col-12">
+    <a routerLink="/">Home</a> ----
+    <a routerLink="/chats">Chat <span *ngIf="clients$ | async as clients">({{clients.length}} users online!)</span></a>
+    </div>
+  </div>
+  <router-outlet></router-outlet>
+</div>
