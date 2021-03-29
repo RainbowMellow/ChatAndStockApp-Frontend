@@ -1,12 +1,18 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
 <div *ngIf="error$ | async as error" style="color: darkred">
   {{error}}
 </div>
 
-<div class="row vh-100" *ngIf="chatClient" style="padding-top: 30px; padding-bottom: 20px">
+<div class="row vh-100" *ngIf="chatClient" style="padding-top: 50px; padding-bottom: 40px">
   <div class="col-3">
     <div class="card h-100">
       <div class="card-header">
-        Clients:
+        <h5>Clients:</h5>
       </div>
       <div class="card-body">
         <div *ngIf="clients$ | async as clients">
@@ -22,23 +28,37 @@
   <div class="col-9">
     <div class="card h-100">
       <div class="card-header">
-        <h5>Hello {{chatClient.name}}</h5>
+        <h5>Live Chat: </h5>
       </div>
       <div class="card-body">
-        <h5 id='list' *ngFor="let message of messages">
-          ({{message.timeSent | date: 'H:mm:ss'}}) {{message.sender?.name}}: {{message.message}}
-        </h5>
+        <div id='list' *ngFor="let message of messages">
+          <div class="row" style="margin-left: 10px">
+            <i class="fa fa-user" style="font-size:50px; margin-right: 20px"></i>
+            <div style="margin-bottom: 15px">
+              <h6 *ngIf="message.sender != null">
+                <i><b>{{message.sender?.name}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{message.timeSent | date: 'H:mm:ss'}}</b></i>
+              </h6>
+              <h6 *ngIf="message.sender == null">
+                <i><b>{{message.senderName}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{message.timeSent | date: 'H:mm:ss'}}</b></i>
+              </h6>
+              <h6>{{message.message}}</h6>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="card-footer">
         <form class="form-inline">
           <div class="input-group flex-fill">
-            <input type="text" class="form-control" [formControl]="messageFC" placeholder="Write message here..">
-            <button type="button" (click)="sendMessage()" class="btn btn-primary">Send Message</button>
+            <input type="text" class="form-control" [formControl]="messageFC" placeholder="Write message here.."
+                   style="margin-right: 10px">
+            <button type="button" (click)="sendMessage()" class="btn btn-primary">
+              <i class="fa fa-send"></i>
+            </button>
           </div>
         </form>
-        <div style="height: 15px">
+        <div style="height: 30px">
           <span
-            *ngIf="clientsTyping.length > 0" style="color: blue; font-size: 15px">
+            *ngIf="clientsTyping.length > 0" style="color: blue; font-size: 15px; margin-top: 10px">
             Clients Typing:
             <span *ngFor="let client of clientsTyping; let i = index">
               {{client.name}}
@@ -54,12 +74,12 @@
   <div class="card">
     <div class="card-body">
       <h1>Welcome to the chat!</h1>
-        <div class="form-group">
-          <label for="nameFC" style="margin-right: 10px">Enter Nickname:</label>
+        <div class="form-group text-center">
+          <label for="nameFC" style="margin-right: 10px; margin-top: 20px">Enter Nickname:</label>
           <input type="text" [formControl]="nameFC" id="nameFC">
         </div>
-      <div class="row justify-content-end">
-        <button type="button" (click)="sendName()" style="margin-top: 20px" class="btn btn-success">Send Name</button>
+      <div class="row justify-content-center">
+        <button type="button" (click)="sendName()" style="margin-top: 5px" class="btn btn-success">Send Name</button>
       </div>
     </div>
   </div>

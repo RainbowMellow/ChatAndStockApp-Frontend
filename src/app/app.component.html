@@ -1,9 +1,21 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
 <div class="container">
   <div class="row navbar-style">
     <div class="col-12">
-    <a routerLink="/">Home</a> ----
-    <a routerLink="/chats">Chat <span *ngIf="clients$ | async as clients">({{clients.length}} users online!)</span></a>
+    <a routerLink="/">
+      <i class="fa fa-home" style="font-size:30px"></i>
+    </a> ----
+    <a routerLink="/chats">
+      <i class="fa fa-comments" style="font-size:29px"></i>
+      <span *ngIf="clients$ | async as clients"> ({{clients.length}} users online!)</span>
+    </a>
     </div>
   </div>
   <router-outlet></router-outlet>
 </div>
+

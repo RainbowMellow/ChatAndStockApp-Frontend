@@ -1,7 +1,8 @@
 import { ChatClient } from './chat-client.model';
 
 export interface ChatMessage {
-  sender: ChatClient;
+  sender?: ChatClient;
+  senderName?: string;
   message: string;
   timeSent: Date;
 }

@@ -30,9 +30,12 @@ export class ChatComponent implements OnInit, OnDestroy {
       )
       .subscribe(message => {
         this.messages.push(message);
+        console.log(message.sender + ', ' + message.message + ', ' + message.timeSent);
       });
 
     this.clients$ = this.chatService.listenForClients();
+    console.log(this.clients$);
+
     this.error$ = this.chatService.listenForErrors();
 
     this.messageFC.valueChanges
@@ -45,10 +48,11 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.chatService.listenForClientTyping()
       .pipe(takeUntil(this.unsubscriber$))
       .subscribe((chatClient) => {
+
         if (chatClient.isTyping && !this.clientsTyping.find((c) => c.id === chatClient.id)) {
           this.clientsTyping.push(chatClient);
-        } else {
-          this.clientsTyping = this.clientsTyping.filter((c) => c.id !== chatClient.id);
+        } else if (!chatClient.isTyping && this.clientsTyping.find((c) => c.id === chatClient.id)){
+           this.clientsTyping = this.clientsTyping.filter((c) => c.id !== chatClient.id);
         }
       });
 
