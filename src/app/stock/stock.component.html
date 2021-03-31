@@ -1,0 +1,72 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+<div class="row vh-100" style="padding-top: 50px; padding-bottom: 40px">
+  <div class="col-3">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5>Stocks:</h5>
+      </div>
+      <div class="card-body">
+        <table class="table table-hover">
+          <tbody>
+            <div *ngIf="stocks$ | async as stocks">
+              <tr *ngFor="let stock of stocks" (click)="onClickStock(stock)">
+                <td>{{stock.name}}</td>
+                <td>{{stock.value}}</td>
+              </tr>
+            </div>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-9">
+
+    <div *ngIf="!currentStock" class="card h-100">
+      <div class="card-header">
+        <h5>Selected Stock: </h5>
+      </div>
+      <div class="card-body d-flex flex-column">
+        <div class="row justify-content-center" style="margin-top: 20px">
+          <h3>Please choose a stock</h3>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="currentStock" class="card h-100">
+      <div class="card-header">
+        <h5>Selected Stock: </h5>
+      </div>
+        <div class="card-body d-flex flex-column">
+          <div class="row justify-content-center" style="margin-top: 20px">
+            <h3>{{currentStock.name}}</h3>
+          </div>
+          <div style="margin-left: 20px; margin-top: 30px">
+            <h4>Description:</h4>
+            <h5 style="font-weight: normal">{{currentStock.description}}</h5>
+          </div>
+          <div class="row mx-auto" style="margin-top: 100px">
+            <div class="form-group">
+              <input type="number" [formControl]="value" style="width: 220px" readonly>
+              <label class="form-text" style="font-size: 12px">
+                Initial value ({{currentStock.startValueDate | date: 'yyyy-MM-dd'}}) = {{currentStock.dayStartValue}}
+              </label>
+            </div>
+
+            <div class="btn-group-vertical plusAndMinusBtns" style="margin-top: 5px">
+              <button class="btn"><i class="fa fa-plus-square" style="font-size:18px" (click)="increaseAmount()"></i></button>
+              <button class="btn"><i class="fa fa-minus-square" style="font-size:18px" (click)="decreaseAmount()"></i></button>
+            </div>
+          </div>
+          <div class="btn-group btns mt-auto ml-auto">
+            <button class="btn"><i class="fa fa-edit" style="font-size:25px" (click)="saveEdit()"></i></button>
+            <button class="btn"><i class="fa fa-trash" style="font-size:25px" (click)="deleteStock()"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
