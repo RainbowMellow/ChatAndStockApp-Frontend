@@ -4,6 +4,7 @@ import {Observable, Subject} from 'rxjs';
 import {StockService} from './shared/stock.service';
 import {FormControl} from '@angular/forms';
 import {takeUntil} from 'rxjs/operators';
+import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-stock',
@@ -16,7 +17,12 @@ export class StockComponent implements OnInit, OnDestroy {
   currentStock: Stock | undefined;
   value = new FormControl('');
 
-  constructor(private stockService: StockService) { }
+  name = new FormControl('');
+  description = new FormControl('');
+
+  closeResult: string;
+
+  constructor(private stockService: StockService, private modalService: NgbModal) { }
 
   ngOnInit(): void {
     this.stockService.getStocks();
@@ -34,21 +40,28 @@ export class StockComponent implements OnInit, OnDestroy {
   onClickStock(stock: Stock): void {
     this.currentStock = stock;
     this.value.setValue(this.currentStock.value);
+    this.name.setValue(this.currentStock.name);
+    this.description.setValue(this.currentStock.description);
     console.log(this.currentStock.name + ' clicked!');
   }
 
   increaseAmount(): void {
-    console.log(this.value.value + 1);
-    this.value.setValue(Math.round((this.value.value + 0.01) * 100) / 100);
+    const newValue = Math.round((this.currentStock.value + 0.01) * 100) / 100;
+    this.value.setValue(newValue);
+    this.currentStock.value = newValue;
+    this.stockService.saveEdit(this.currentStock);
+    this.stocks$ = this.stockService.listenForEditStock();
   }
 
   decreaseAmount(): void {
-    console.log(this.value.value - 1);
-    this.value.setValue(Math.round((this.value.value - 0.01) * 100) / 100);
+    const newValue = Math.round((this.currentStock.value - 0.01) * 100) / 100;
+    this.value.setValue(newValue);
+    this.currentStock.value = newValue;
+    this.stockService.saveEdit(this.currentStock);
+    this.stocks$ = this.stockService.listenForEditStock();
   }
 
   saveEdit(): void {
-    this.currentStock.value = this.value.value;
     this.stockService.saveEdit(this.currentStock);
     this.stocks$ = this.stockService.listenForEditStock();
   }
@@ -59,4 +72,38 @@ export class StockComponent implements OnInit, OnDestroy {
     this.currentStock = null;
     this.stocks$ = this.stockService.listenForDeleteStock();
   }
+
+
+  //region ModalStuff
+
+  openDelete(content): void {
+    this.modalService.open(content, {ariaLabelledBy: 'delete'}).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+      this.deleteStock();
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  openEdit(content): void {
+    this.modalService.open(content, {ariaLabelledBy: 'edit'}).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+      this.currentStock.name = this.name.value;
+      this.currentStock.description = this.description.value;
+      this.saveEdit();
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return  `with: ${reason}`;
+    }
+  }
+  //endregion
 }
