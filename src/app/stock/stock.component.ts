@@ -47,18 +47,18 @@ export class StockComponent implements OnInit, OnDestroy {
 
   increaseAmount(): void {
     const newValue = Math.round((this.currentStock.value + 0.01) * 100) / 100;
-    this.value.setValue(newValue);
     this.currentStock.value = newValue;
     this.stockService.saveEdit(this.currentStock);
     this.stocks$ = this.stockService.listenForEditStock();
+    this.value.setValue(newValue);
   }
 
   decreaseAmount(): void {
     const newValue = Math.round((this.currentStock.value - 0.01) * 100) / 100;
-    this.value.setValue(newValue);
     this.currentStock.value = newValue;
     this.stockService.saveEdit(this.currentStock);
     this.stocks$ = this.stockService.listenForEditStock();
+    this.value.setValue(newValue);
   }
 
   saveEdit(): void {

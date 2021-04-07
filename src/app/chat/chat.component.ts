@@ -5,6 +5,9 @@ import {Observable, Subject} from 'rxjs';
 import {debounce, debounceTime, distinctUntilChanged, take, takeUntil} from 'rxjs/operators';
 import {ChatClient} from './shared/chat-client.model';
 import {ChatMessage} from './shared/chat-message.model';
+import {ChatState} from './state/chat.state';
+import {Select, Store} from '@ngxs/store';
+import {ListenForClients} from './state/chat.actions';
 
 @Component({
   selector: 'app-chat',
@@ -17,13 +20,18 @@ export class ChatComponent implements OnInit, OnDestroy {
   messages: ChatMessage[] = [];
   clientsTyping: ChatClient[] = [];
   unsubscriber$ = new Subject();
+
+  @Select(ChatState.clients)
   clients$: Observable<ChatClient[]> | undefined;
+
   chatClient: ChatClient | undefined;
   error$: Observable<string> | undefined;
 
-  constructor(private chatService: ChatService) { }
+  constructor(private chatService: ChatService, private store: Store) { }
 
   ngOnInit(): void {
+    this.store.dispatch(new ListenForClients());
+
     this.chatService.listenForMessages()
       .pipe(
         takeUntil(this.unsubscriber$)
@@ -33,7 +41,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         console.log(message.sender + ', ' + message.message + ', ' + message.timeSent);
       });
 
-    this.clients$ = this.chatService.listenForClients();
+    // this.clients$ = this.chatService.listenForClients();
     console.log(this.clients$);
 
     this.error$ = this.chatService.listenForErrors();
