@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import {Action, Selector, State, StateContext} from '@ngxs/store';
 import {ChatClient} from '../shared/chat-client.model';
-import {ListenForClients, UpdateClients} from './chat.actions';
+import {ListenForClients, StopListeningForClients, UpdateClients} from './chat.actions';
 import {ChatService} from '../shared/chat.service';
+import {Subscription} from 'rxjs';
 
 export interface ChatStateModel {
   chatClients: ChatClient[];
@@ -16,6 +17,7 @@ export interface ChatStateModel {
 })
 @Injectable()
 export class ChatState {
+  private clientsUnsub: Subscription | undefined;
   constructor(private chatService: ChatService) {
   }
   @Selector()
@@ -25,23 +27,31 @@ export class ChatState {
 
   @Action(ListenForClients)
   getClients(ctx: StateContext<ChatStateModel>): void {
-    this.chatService.listenForClients()
+    this.clientsUnsub = this.chatService.listenForClients()
       .subscribe(clients => {
-        const state = ctx.getState();
-        const newState: ChatStateModel = {
-          ...state,
-          chatClients: clients
-        };
-
-        ctx.setState(newState);
+        ctx.dispatch(new UpdateClients(clients));
       });
+  }
+
+  @Action(StopListeningForClients)
+  stopListeningForClients(ctx: StateContext<ChatStateModel>): void {
+    if (this.clientsUnsub) {
+      this.clientsUnsub.unsubscribe();
+    }
   }
 
   @Action(UpdateClients)
   updateClients(ctx: StateContext<ChatStateModel>, uc: UpdateClients): void {
     this.chatService.listenForClients()
       .subscribe(clients => {
-        ctx.dispatch(new UpdateClients(clients));
+        const state = ctx.getState();
+        const oldClients = [...state.chatClients];
+        oldClients.push({id: '22', name: 'dd', isTyping: false});
+        const newState: ChatStateModel = {
+          ...state,
+          chatClients: uc.clients
+        };
+        ctx.setState(newState);
       });
   }
 }

@@ -7,7 +7,7 @@ import {ChatClient} from './shared/chat-client.model';
 import {ChatMessage} from './shared/chat-message.model';
 import {ChatState} from './state/chat.state';
 import {Select, Store} from '@ngxs/store';
-import {ListenForClients} from './state/chat.actions';
+import {ListenForClients, StopListeningForClients} from './state/chat.actions';
 
 @Component({
   selector: 'app-chat',
@@ -82,6 +82,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     console.log('Destroyed');
     this.unsubscriber$.next();
     this.unsubscriber$.complete();
+    this.store.dispatch(new StopListeningForClients());
   }
 
   sendMessage(): void {

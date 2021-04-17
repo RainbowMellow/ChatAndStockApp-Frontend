@@ -10,6 +10,8 @@ import {CommonModule} from '@angular/common';
 import {environment} from '../environments/environment.prod';
 import {NgxsModule} from '@ngxs/store';
 import {ChatState} from './chat/state/chat.state';
+import {NgxsStoragePluginModule} from '@ngxs/storage-plugin';
+import {StockState} from './stock/state/stock.state';
 
 @Injectable()
 export class SocketChat extends Socket {
@@ -30,6 +32,7 @@ export class SocketStock extends Socket {
 }
 // const config: SocketIoConfig = {url: 'http://localhost:4300', options: {}};
 
+
 @NgModule({
   declarations: [
     AppComponent
@@ -41,8 +44,11 @@ export class SocketStock extends Socket {
     FormsModule,
     NgbModule,
     CommonModule,
-    NgxsModule.forRoot([ChatState], {
+    NgxsModule.forRoot([], {
       developmentMode: !environment.production
+    }),
+    NgxsStoragePluginModule.forRoot({
+      key: StockState
     })
   ],
   providers: [SocketChat, SocketStock],

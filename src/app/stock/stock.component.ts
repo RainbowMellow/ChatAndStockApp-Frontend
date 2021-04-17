@@ -5,6 +5,11 @@ import {StockService} from './shared/stock.service';
 import {FormControl} from '@angular/forms';
 import {takeUntil} from 'rxjs/operators';
 import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {StockState} from './state/stock.state';
+import {Select, Store} from '@ngxs/store';
+import {ListenForClients} from '../chat/state/chat.actions';
+import {ListenForStocks, StopListeningForStocks} from './state/stock.actions';
+
 
 @Component({
   selector: 'app-stock',
@@ -12,7 +17,10 @@ import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./stock.component.scss']
 })
 export class StockComponent implements OnInit, OnDestroy {
-  stocks$: Observable<Stock[]> | undefined;
+
+  @Select(StockState.stocks) stocks$: Observable<Stock[]> | undefined;
+
+  // stocks$: Observable<Stock[]>;
   unsubscribe$ = new Subject();
   currentStock: Stock | undefined;
   value = new FormControl('');
@@ -22,11 +30,16 @@ export class StockComponent implements OnInit, OnDestroy {
 
   closeResult: string;
 
-  constructor(private stockService: StockService, private modalService: NgbModal) { }
+  constructor(private stockService: StockService, private modalService: NgbModal, private store: Store) { }
 
   ngOnInit(): void {
     this.stockService.getStocks();
-    this.stocks$ = this.stockService.listenForStocks();
+
+    this.store.dispatch(new ListenForStocks());
+
+    // this.stocks$.subscribe( p => p.length);
+
+    // this.stocks$ = this.stockService.listenForStocks();
     this.stocks$.subscribe(r => {console.log(r.length); });
 
   }
@@ -35,6 +48,7 @@ export class StockComponent implements OnInit, OnDestroy {
     console.log('Destroyed');
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.store.dispatch(new StopListeningForStocks());
   }
 
   onClickStock(stock: Stock): void {
